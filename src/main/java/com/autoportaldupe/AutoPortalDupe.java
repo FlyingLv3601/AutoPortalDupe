@@ -3,12 +3,16 @@ package com.autoportaldupe;
 
 
 
-import com.autoportaldupe.scanner.FindChest;
+import com.autoportaldupe.scanner.ChestPositionSave;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
+
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 
 
 public class AutoPortalDupe implements ClientModInitializer {
@@ -18,26 +22,22 @@ public class AutoPortalDupe implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
-        // HUD текст
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-
             dispatcher.register(
-                    ClientCommandManager.literal("search")
-                            .executes(context -> {
-                                searching = !searching;
-                                context.getSource().sendFeedback(
-                                        Text.literal("Поиск: " + (searching ? "Включен" : "Выключен"))
-                                );
-                                return 1;
-                            })
-            );
+                    ClientCommandManager.literal("Cpos") // get pos of barrel and redstone block(start pos)
+                            .then(argument("KitName", StringArgumentType.string())
+                                .executes(context -> {
+                                    String kitName = StringArgumentType.getString(context, "KitName");
+                                    MinecraftClient client = MinecraftClient.getInstance();
+                                    context.getSource().sendFeedback(Text.literal(String.format("Kit: %s is saved", kitName)));
+                                    double playerXpos = client.player.getX();
+                                    double playerZpos = client.player.getZ();
+                                    double playerYpos = client.player.getY();
 
-            dispatcher.register(
-                    ClientCommandManager.literal("scanWorld")
-                            .executes(context -> {
-                                FindChest.printDoubleChests();
-                                return 1;
-                            })
+                                    ChestPositionSave.addChest(kitName, playerXpos, playerZpos, playerYpos );
+                                    return 1;
+                                 })
+                            )
             );
 
         });
