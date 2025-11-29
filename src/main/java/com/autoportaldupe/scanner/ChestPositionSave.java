@@ -19,7 +19,7 @@ public class ChestPositionSave {
                 double posY =(int) y;
 
                 ObjectMapper mapper = new ObjectMapper();
-                File file = new File("AutoPortalDupe/chests.json");
+                File file = new File("chests.json");
 
                 List<Map<String, String>> chests = new ArrayList<>();
                 if (file.exists()) {
@@ -38,6 +38,38 @@ public class ChestPositionSave {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+    }
+
+
+
+    public static void addPos(String kitname, double x, double z, double y) {
+        try {
+
+            double posX = (int) x;
+            double posZ = (int) z;
+            double posY = (int) y;
+
+            ObjectMapper mapper = new ObjectMapper();
+            File file = new File("autoportaldupe.json");
+
+            List<Map<String, String>> chests = new ArrayList<>();
+            if (file.exists()) {
+                chests = mapper.readValue(file, List.class);
+            }
+
+            Map<String, String> chest = new HashMap<>();
+            chest.put("kitname", kitname);
+            chest.put("x", String.valueOf(x));
+            chest.put("z", String.valueOf(z));
+            chest.put("y", String.valueOf(y));
+
+            chests.add(chest);
+            mapper.writeValue(file, chests);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }
